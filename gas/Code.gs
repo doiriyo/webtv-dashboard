@@ -257,15 +257,8 @@ function collectFeedInsights() {
 
     const mediaType = media.media_type === 'CAROUSEL_ALBUM' ? 'カルーセル' : '静止画';
 
-    // 確実に取れるメトリクスを一括取得
-    const base = safeGetInsights(media.id, 'reach,saved');
-    // 個別取得
-    const views = safeGetInsight(media.id, 'views');
-    const shares = safeGetInsight(media.id, 'shares');
-    const totalInteractions = safeGetInsight(media.id, 'total_interactions');
-    const follows = safeGetInsight(media.id, 'follows');
-    const profileActivity = safeGetInsight(media.id, 'profile_activity');
-    const profileVisits = safeGetInsight(media.id, 'profile_visits');
+    // メトリクスを一括取得（API呼び出し1回に統合）
+    const ins = safeGetInsights(media.id, 'views,reach,saved,shares,total_interactions,follows,profile_activity,profile_visits');
 
     const postDate = Utilities.formatDate(new Date(media.timestamp), 'Asia/Tokyo', 'yyyy/M/d');
     const caption = (media.caption || '').substring(0, 100);
@@ -274,31 +267,31 @@ function collectFeedInsights() {
       const daysSince = (new Date() - new Date(media.timestamp)) / 86400000;
       if (daysSince <= 30) {
         updateRow(sheet, media.id, 13, {
-          4: views,                         // 閲覧数
-          5: base.reach || 0,               // リーチ
+          4: ins.views || 0,                // 閲覧数
+          5: ins.reach || 0,                // リーチ
           6: media.like_count || 0,         // いいね
           7: media.comments_count || 0,     // コメント
-          8: base.saved || 0,               // 保存数
-          9: shares,                        // シェア
-          10: totalInteractions,            // インタラクション合計
-          11: follows,                      // フォロー数
-          12: profileActivity,              // プロフィールアクティビティ
-          13: profileVisits,                // プロフィール訪問数
-          15: new Date(),                   // 最終更新
+          8: ins.saved || 0,                // 保存数
+          9: ins.shares || 0,               // シェア
+          10: ins.total_interactions || 0,   // インタラクション合計
+          11: ins.follows || 0,              // フォロー数
+          12: ins.profile_activity || 0,     // プロフィールアクティビティ
+          13: ins.profile_visits || 0,       // プロフィール訪問数
+          15: new Date(),                    // 最終更新
         });
         updateCount++;
       }
     } else {
       sheet.appendRow([
         postDate, caption, mediaType,
-        views, base.reach || 0, media.like_count || 0, media.comments_count || 0,
-        base.saved || 0, shares,
-        totalInteractions, follows, profileActivity, profileVisits,
+        ins.views || 0, ins.reach || 0, media.like_count || 0, media.comments_count || 0,
+        ins.saved || 0, ins.shares || 0,
+        ins.total_interactions || 0, ins.follows || 0, ins.profile_activity || 0, ins.profile_visits || 0,
         media.id, new Date(),
       ]);
       newCount++;
     }
-    Utilities.sleep(1000);
+    Utilities.sleep(500);
   }
 
   writeLog('INFO', `通常投稿: 新規${newCount}件, 更新${updateCount}件`);
@@ -334,14 +327,8 @@ function collectReelsInsights() {
   for (const media of mediaResponse.data) {
     if (media.media_product_type !== 'REELS') continue;
 
-    // 確実に取れるメトリクスを一括取得
-    const base = safeGetInsights(media.id, 'reach,saved');
-    // 個別取得
-    const views = safeGetInsight(media.id, 'views');
-    const shares = safeGetInsight(media.id, 'shares');
-    const totalInteractions = safeGetInsight(media.id, 'total_interactions');
-    const avgWatchTime = safeGetInsight(media.id, 'ig_reels_avg_watch_time');
-    const totalWatchTime = safeGetInsight(media.id, 'ig_reels_video_view_total_time');
+    // メトリクスを一括取得（API呼び出し1回に統合）
+    const ins = safeGetInsights(media.id, 'views,reach,saved,shares,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time');
 
     const postDate = Utilities.formatDate(new Date(media.timestamp), 'Asia/Tokyo', 'yyyy/M/d');
     const caption = (media.caption || '').substring(0, 100);
@@ -350,31 +337,31 @@ function collectReelsInsights() {
       const daysSince = (new Date() - new Date(media.timestamp)) / 86400000;
       if (daysSince <= 30) {
         updateRow(sheet, media.id, 11, {
-          3: views,                         // 閲覧数
-          4: base.reach || 0,               // リーチ
-          5: media.like_count || 0,         // いいね
-          6: media.comments_count || 0,     // コメント
-          7: base.saved || 0,               // 保存数
-          8: shares,                        // シェア
-          9: totalInteractions,             // インタラクション合計
-          10: avgWatchTime,                 // 平均視聴時間
-          11: totalWatchTime,               // 総再生時間
-          13: new Date(),                   // 最終更新
+          3: ins.views || 0,                              // 閲覧数
+          4: ins.reach || 0,                              // リーチ
+          5: media.like_count || 0,                       // いいね
+          6: media.comments_count || 0,                   // コメント
+          7: ins.saved || 0,                              // 保存数
+          8: ins.shares || 0,                             // シェア
+          9: ins.total_interactions || 0,                  // インタラクション合計
+          10: ins.ig_reels_avg_watch_time || 0,           // 平均視聴時間
+          11: ins.ig_reels_video_view_total_time || 0,    // 総再生時間
+          13: new Date(),                                  // 最終更新
         });
         updateCount++;
       }
     } else {
       sheet.appendRow([
         postDate, caption,
-        views, base.reach || 0, media.like_count || 0, media.comments_count || 0,
-        base.saved || 0, shares,
-        totalInteractions,
-        avgWatchTime, totalWatchTime,
+        ins.views || 0, ins.reach || 0, media.like_count || 0, media.comments_count || 0,
+        ins.saved || 0, ins.shares || 0,
+        ins.total_interactions || 0,
+        ins.ig_reels_avg_watch_time || 0, ins.ig_reels_video_view_total_time || 0,
         media.id, new Date(),
       ]);
       newCount++;
     }
-    Utilities.sleep(1000);
+    Utilities.sleep(500);
   }
 
   writeLog('INFO', `リール: 新規${newCount}件, 更新${updateCount}件`);
@@ -418,26 +405,20 @@ function collectStoriesInsights() {
   for (const story of storiesResponse.data) {
     if (existingIds.has(story.id)) continue;
 
-    const views = safeGetInsight(story.id, 'views');
-    const reach = safeGetInsight(story.id, 'reach');
-    const shares = safeGetInsight(story.id, 'shares');
-    const totalInteractions = safeGetInsight(story.id, 'total_interactions');
-    const follows = safeGetInsight(story.id, 'follows');
-    const profileActivity = safeGetInsight(story.id, 'profile_activity');
-    const profileVisits = safeGetInsight(story.id, 'profile_visits');
-    const navigation = safeGetInsight(story.id, 'navigation');
+    // メトリクスを一括取得（API呼び出し1回に統合）
+    const ins = safeGetInsights(story.id, 'views,reach,shares,total_interactions,follows,profile_activity,profile_visits,navigation');
 
     const postDate = Utilities.formatDate(new Date(story.timestamp), 'Asia/Tokyo', 'yyyy/M/d');
     const caption = (story.caption || '').substring(0, 100);
 
     sheet.appendRow([
       postDate, caption,
-      views, reach, shares, totalInteractions,
-      follows, profileActivity, profileVisits, navigation,
+      ins.views || 0, ins.reach || 0, ins.shares || 0, ins.total_interactions || 0,
+      ins.follows || 0, ins.profile_activity || 0, ins.profile_visits || 0, ins.navigation || 0,
       story.id, new Date(),
     ]);
     newCount++;
-    Utilities.sleep(1000);
+    Utilities.sleep(500);
   }
 
   writeLog('INFO', `ストーリーズ: 新規${newCount}件`);
