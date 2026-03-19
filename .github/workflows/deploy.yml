@@ -1,0 +1,24 @@
+name: Deploy to Xserver
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-xserver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx vite build --base=/webtv-db/
+      - name: Deploy to Xserver via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASS }}
+          local-dir: ./dist/
+          server-dir: /webtv-db/
