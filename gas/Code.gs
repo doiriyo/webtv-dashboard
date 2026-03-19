@@ -247,7 +247,7 @@ function collectFeedInsights() {
 
   const mediaResponse = callApi(`${igUserId}/media`, {
     fields: 'id,caption,timestamp,media_type,media_product_type,like_count,comments_count',
-    limit: '25',
+    limit: '100',
   });
 
   let newCount = 0, updateCount = 0;
@@ -326,7 +326,7 @@ function collectReelsInsights() {
 
   const mediaResponse = callApi(`${igUserId}/media`, {
     fields: 'id,caption,timestamp,media_type,media_product_type,like_count,comments_count',
-    limit: '25',
+    limit: '100',
   });
 
   let newCount = 0, updateCount = 0;

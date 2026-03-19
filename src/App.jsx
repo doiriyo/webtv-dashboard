@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 
 // ── API設定 ──
-const API_URL = 'https://script.google.com/macros/s/AKfycbx6VMCH_hfhc8JeTRWH5n0vhHoCSuQQ1x_awXZ5UY2thNAGB7l3eoNw7o-Vsjm4/exec'
+const API_URL = 'https://script.google.com/macros/s/AKfycbx3fK6vqL6sO0O23cvNonlLflirOKmW4ZCTaKpFMUasoaxJt2P0LbL6XaAyNKi1/exec'
 
 // ── カラーテーマ ──
 const C = {
